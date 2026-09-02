@@ -23,15 +23,40 @@ const montserrat = Montserrat({
 export const metadata: Metadata = {
   metadataBase: new URL("https://yourlearningmentor.com"),
   title: {
-    default: "YourLearningMentor — Free Academic Tools & Study Resources",
+    default: "YourLearningMentor — Free Academic Tools, GPA Calculators & Tutor Search",
     template: "%s | YourLearningMentor",
   },
-  description: "Free online calculators for GPA, CGPA, Attendance, Audiobook listening, GTU, KIIT, SRM, VIT, Drexel, CASPA, Howard County, IB, IPU, and student mentor tools.",
+  description:
+    "Free online calculators for CGPA, GPA, GTU, KIIT, SRM, VIT, Drexel, CASPA, IB, IPU, Attendance, and Audiobook progress. Connect directly with verified tutors across India.",
+  keywords: [
+    "CGPA Calculator",
+    "GPA Calculator",
+    "KIIT CGPA Calculator",
+    "GTU CGPA to Percentage",
+    "SRM GPA Calculator",
+    "VIT GPA Calculator",
+    "Find a Tutor",
+    "Home Tutors in India",
+    "Online Tutors",
+    "Attendance Calculator",
+    "Audiobook Percentage Calculator",
+  ],
+  authors: [{ name: "YourLearningMentor", url: "https://yourlearningmentor.com" }],
+  creator: "YourLearningMentor",
+  publisher: "YourLearningMentor",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
     url: "https://yourlearningmentor.com",
     siteName: "YourLearningMentor",
+    title: "YourLearningMentor — Free Academic Tools & Tutor Marketplace",
+    description:
+      "Free online calculators for CGPA, GPA, GTU, KIIT, SRM, VIT, Drexel, CASPA, IB, IPU, and student mentor tools.",
     images: [
       {
         url: "/og/home.png",
@@ -50,7 +75,44 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
+};
+
+const siteSchemaJson = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://yourlearningmentor.com/#website",
+      url: "https://yourlearningmentor.com/",
+      name: "YourLearningMentor",
+      description: "Free online academic calculators, GPA converters, and tutor directory.",
+      publisher: { "@id": "https://yourlearningmentor.com/#organization" },
+      potentialAction: {
+        "@type": "SearchAction",
+        target: {
+          "@type": "EntryPoint",
+          urlTemplate: "https://yourlearningmentor.com/find-a-tutor?q={search_term_string}",
+        },
+        "query-input": "required name=search_term_string",
+      },
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://yourlearningmentor.com/#organization",
+      name: "YourLearningMentor",
+      url: "https://yourlearningmentor.com/",
+      logo: "https://yourlearningmentor.com/og/home.png",
+      sameAs: [],
+    },
+  ],
 };
 
 export default function RootLayout({
@@ -60,6 +122,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${montserrat.variable}`}>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(siteSchemaJson) }}
+        />
+      </head>
       <body className="flex min-h-screen flex-col font-sans antialiased bg-background text-foreground">
         <Navbar />
         <main className="flex-1">{children}</main>
