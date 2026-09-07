@@ -1,6 +1,7 @@
 import { MetadataRoute } from "next";
+import { supabase } from "@/integrations/supabase/client";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://yourlearningmentor.com";
   
   const highPriorityRoutes = [
@@ -70,5 +71,28 @@ export default function sitemap(): MetadataRoute.Sitemap {
     });
   });
 
+  // Dynamically include all active verified tutor profile pages
+  try {
+    const { data: tutors } = await supabase
+      .from("tutors_public")
+      .select("slug, updated_at, created_at");
+
+    if (tutors && tutors.length > 0) {
+      tutors.forEach((t) => {
+        if (t.slug) {
+          items.push({
+            url: `${baseUrl}/tutor/${t.slug}`,
+            lastModified: t.updated_at || t.created_at || new Date().toISOString(),
+            changeFrequency: "weekly",
+            priority: 0.8,
+          });
+        }
+      });
+    }
+  } catch (err) {
+    console.error("Error generating sitemap tutor routes:", err);
+  }
+
   return items;
 }
+

@@ -75,15 +75,19 @@ export const POPULAR_SUBJECTS = [
   "Spoken English",
 ];
 
-export const slugify = (s: string): string =>
-  s
+export const slugify = (s?: string | null): string =>
+  (s ?? "")
+    .toString()
     .toLowerCase()
     .trim()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
 
-export const unslug = (s: string): string =>
-  s.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+export const unslug = (s?: string | null): string =>
+  (s ?? "")
+    .toString()
+    .replace(/-/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
 
 export const modeLabel = (m?: string | null) =>
   m === "online" ? "Online" : m === "offline" ? "Home Tutor" : "Online & Home Tutor";

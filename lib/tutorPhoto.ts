@@ -26,3 +26,23 @@ export async function uploadTutorPhoto(file: File): Promise<string> {
   if (signErr || !data?.signedUrl) throw signErr ?? new Error("Failed to sign URL");
   return data.signedUrl;
 }
+
+export function resolveTutorPhotoUrl(url?: string | null): string | null {
+  if (!url) return null;
+  const currentUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://jzgxtchblpvfwgtcfnmf.supabase.co";
+  const projectRef = currentUrl.replace(/^https?:\/\//, "").split(".")[0];
+
+  let clean = url
+    .replace(/YOUR_NEW_PROJECT_REF/gi, projectRef)
+    .replace(/qvvhagyfzvhairnqpugs/gi, projectRef);
+
+  // Convert signed URLs with old/invalid tokens to clean public URLs
+  if (clean.includes("/storage/v1/object/sign/")) {
+    clean = clean.replace("/storage/v1/object/sign/", "/storage/v1/object/public/");
+    clean = clean.split("?")[0];
+  }
+
+  return clean;
+}
+
+

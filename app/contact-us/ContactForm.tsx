@@ -43,6 +43,18 @@ export default function ContactForm() {
     setSubmitted(true);
     form.reset();
     toast.success("Message sent! We'll get back to you with available slots.");
+
+    // Trigger instant email notification to admin in the background
+    fetch("/api/notify-lead", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        type: "counselling",
+        name,
+        email,
+        message,
+      }),
+    }).catch((err) => console.error("Counselling email alert error:", err));
   };
 
   return (

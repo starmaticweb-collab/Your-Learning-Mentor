@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import { resolveTutorPhotoUrl } from "@/lib/tutorPhoto";
 import { z } from "zod";
 import PageLoader from "@/components/PageLoader";
 import { Button } from "@/components/ui/button";
@@ -118,6 +120,23 @@ export default function TutorProfileClient({ slug }: { slug: string }) {
       email: (row as TutorContact).email ?? null,
     });
     form.reset();
+
+    // Trigger instant email notification to admin in the background
+    fetch("/api/notify-lead", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        type: "tutor_lead",
+        student_name: parsed.data.student_name,
+        student_email: parsed.data.student_email,
+        tutor_name: tutor.name,
+        tutor_slug: tutor.slug,
+        subjects: tutor.subjects,
+        mode: tutor.mode,
+        city: tutor.city,
+        area: tutor.area,
+      }),
+    }).catch((err) => console.error("Lead email alert error:", err));
   };
 
   if (loading) return <PageLoader />;
@@ -155,14 +174,14 @@ export default function TutorProfileClient({ slug }: { slug: string }) {
             <section className="bg-card rounded-3xl p-7 sm:p-8 shadow-sm border border-border flex flex-col items-center text-center">
               <div className="relative mb-6">
                 <div className="w-32 h-32 rounded-3xl overflow-hidden ring-4 ring-background shadow-md bg-muted flex items-center justify-center text-3xl font-semibold text-muted-foreground">
-                  {tutor.photo_url ? (
-                    <img
-                      src={tutor.photo_url}
+                  {resolveTutorPhotoUrl(tutor.photo_url) ? (
+                    <Image
+                      src={resolveTutorPhotoUrl(tutor.photo_url)!}
                       alt={`${tutor.name} — tutor photo`}
                       className="h-full w-full object-cover"
                       width={128}
                       height={128}
-                      loading="eager"
+                      priority
                     />
                   ) : (
                     initials(tutor.name)
@@ -181,7 +200,7 @@ export default function TutorProfileClient({ slug }: { slug: string }) {
               )}
 
               <div className="flex flex-wrap justify-center gap-2 mt-5">
-                {tutor.subjects.slice(0, 6).map((s) => (
+                {(tutor.subjects ?? []).slice(0, 6).map((s) => (
                   <span
                     key={s}
                     className="px-3 py-1 bg-muted text-foreground/80 text-[11px] font-semibold uppercase tracking-tight rounded-lg"
@@ -227,13 +246,13 @@ export default function TutorProfileClient({ slug }: { slug: string }) {
                   <MetaRow label="Qualification" value={tutor.qualification} />
                 )}
                 {(tutor.boards?.length ?? 0) > 0 && (
-                  <MetaRow label="Boards" value={tutor.boards!.join(", ")} />
+                  <MetaRow label="Boards" value={(tutor.boards ?? []).join(", ")} />
                 )}
                 {(tutor.grade_levels?.length ?? 0) > 0 && (
-                  <MetaRow label="Grades" value={tutor.grade_levels!.join(", ")} />
+                  <MetaRow label="Grades" value={(tutor.grade_levels ?? []).join(", ")} />
                 )}
                 {(tutor.languages?.length ?? 0) > 0 && (
-                  <MetaRow label="Languages" value={tutor.languages!.join(", ")} />
+                  <MetaRow label="Languages" value={(tutor.languages ?? []).join(", ")} />
                 )}
                 {tutor.availability && (
                   <MetaRow label="Availability" value={tutor.availability} />

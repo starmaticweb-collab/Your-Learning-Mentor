@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import { resolveTutorPhotoUrl } from "@/lib/tutorPhoto";
 import PageLoader from "@/components/PageLoader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -84,15 +86,36 @@ export default function FindATutorClient({ rest = "" }: { rest?: string }) {
   }, []);
 
   const allSubjects = useMemo(
-    () => Array.from(new Set(tutors.flatMap((t) => t.subjects))).sort(),
+    () =>
+      Array.from(
+        new Set(
+          tutors
+            .flatMap((t) => t.subjects || [])
+            .filter((s): s is string => typeof s === "string" && s.trim().length > 0)
+        )
+      ).sort(),
     [tutors]
   );
   const allCities = useMemo(
-    () => Array.from(new Set(tutors.map((t) => t.city).filter(Boolean) as string[])).sort(),
+    () =>
+      Array.from(
+        new Set(
+          tutors
+            .map((t) => t.city)
+            .filter((c): c is string => typeof c === "string" && c.trim().length > 0)
+        )
+      ).sort(),
     [tutors]
   );
   const allAreas = useMemo(
-    () => Array.from(new Set(tutors.map((t) => t.area).filter(Boolean) as string[])).sort(),
+    () =>
+      Array.from(
+        new Set(
+          tutors
+            .map((t) => t.area)
+            .filter((a): a is string => typeof a === "string" && a.trim().length > 0)
+        )
+      ).sort(),
     [tutors]
   );
 
@@ -136,7 +159,7 @@ export default function FindATutorClient({ rest = "" }: { rest?: string }) {
       if (urlFilters.area && slugify(t.area ?? "") !== urlFilters.area) return false;
       if (urlFilters.subject) {
         const orig = findOriginal(allSubjects, urlFilters.subject);
-        if (!orig || !t.subjects.includes(orig)) return false;
+        if (!orig || !(t.subjects ?? []).includes(orig)) return false;
       }
       if (urlFilters.board) {
         const orig = (BOARDS as readonly string[]).find((b) => slugify(b) === urlFilters.board);
@@ -147,18 +170,19 @@ export default function FindATutorClient({ rest = "" }: { rest?: string }) {
         if (!orig || !(t.grade_levels ?? []).includes(orig)) return false;
       }
 
-      if (subject !== ANY && !t.subjects.includes(subject)) return false;
+      if (subject !== ANY && !(t.subjects ?? []).includes(subject)) return false;
       if (mode !== ANY && t.mode !== mode) return false;
       if (city !== ANY && t.city !== city) return false;
       if (board !== ANY && !(t.boards ?? []).includes(board)) return false;
       if (grade !== ANY && !(t.grade_levels ?? []).includes(grade)) return false;
       if (!needle) return true;
-      const hay = [t.name, t.city ?? "", t.area ?? "", t.subjects.join(" "), t.intro ?? ""]
+      const hay = [t.name ?? "", t.city ?? "", t.area ?? "", (t.subjects ?? []).join(" "), t.intro ?? ""]
         .join(" ")
         .toLowerCase();
       return hay.includes(needle);
     });
   }, [tutors, q, subject, mode, city, board, grade, urlFilters, allSubjects]);
+
 
   const reset = () => {
     setQ("");
@@ -337,12 +361,13 @@ export default function FindATutorClient({ rest = "" }: { rest?: string }) {
                   <CardContent className="p-5">
                     <div className="flex gap-4">
                       <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-muted text-base font-semibold">
-                        {t.photo_url ? (
-                          <img
-                            src={t.photo_url}
+                        {resolveTutorPhotoUrl(t.photo_url) ? (
+                          <Image
+                            src={resolveTutorPhotoUrl(t.photo_url)!}
                             alt={t.name}
                             className="h-14 w-14 rounded-full object-cover"
-                            loading="lazy"
+                            width={56}
+                            height={56}
                           />
                         ) : (
                           initials(t.name)
@@ -350,16 +375,16 @@ export default function FindATutorClient({ rest = "" }: { rest?: string }) {
                       </div>
                       <div className="min-w-0 flex-1">
                         <h2 className="truncate text-lg font-semibold font-heading">{t.name}</h2>
-                        <p className="mt-0.5 text-sm text-muted-foreground">{t.subjects.join(", ")}</p>
+                        <p className="mt-0.5 text-sm text-muted-foreground">{(t.subjects ?? []).join(", ")}</p>
                         <p className="mt-0.5 text-xs text-muted-foreground">
                           {modeLabel(t.mode)}
                           {t.area ? ` · ${t.area}` : ""}
                           {t.city ? ` · ${t.city}` : ""}
-                          {(t.grade_levels?.length ?? 0) > 0 ? ` · ${t.grade_levels!.join(", ")}` : ""}
+                          {(t.grade_levels?.length ?? 0) > 0 ? ` · ${(t.grade_levels ?? []).join(", ")}` : ""}
                         </p>
                         {(t.boards?.length ?? 0) > 0 && (
                           <p className="mt-0.5 text-xs text-muted-foreground">
-                            Boards: {t.boards!.join(", ")}
+                            Boards: {(t.boards ?? []).join(", ")}
                           </p>
                         )}
                       </div>

@@ -142,13 +142,31 @@ const faqs = [
 
 const schemaJson = {
   "@context": "https://schema.org",
-  "@type": "ProfessionalService",
-  name: "YourLearningMentor",
-  url: "https://yourlearningmentor.com",
-  description:
-    "Career counselling service for students and parents — stream selection, college shortlisting, study abroad guidance.",
-  areaServed: "IN",
-  serviceType: "Career Counselling",
+  "@graph": [
+    {
+      "@type": "EducationalOrganization",
+      "@id": "https://yourlearningmentor.com/#edu-org",
+      name: "YourLearningMentor",
+      url: "https://yourlearningmentor.com",
+      logo: "https://yourlearningmentor.com/og/home.png",
+      description:
+        "Independent career counselling, academic tools, and verified tutor directory for students and parents.",
+      areaServed: "IN",
+      sameAs: [],
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://yourlearningmentor.com/#faq",
+      mainEntity: faqs.map((f) => ({
+        "@type": "Question",
+        name: f.q,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: f.a,
+        },
+      })),
+    },
+  ],
 };
 
 export default function HomePage() {
@@ -216,7 +234,7 @@ export default function HomePage() {
                 <span className="text-xs font-bold uppercase tracking-widest text-accent">
                   {c.label}
                 </span>
-                <h3 className="mt-3 text-2xl font-bold md:text-3xl font-heading">{c.title}</h3>
+                <h2 className="mt-3 text-2xl font-bold md:text-3xl font-heading">{c.title}</h2>
                 <ul className="mt-6 space-y-3">
                   {c.points.map((p) => (
                     <li key={p} className="flex items-start gap-3 text-sm text-muted-foreground">
