@@ -219,7 +219,9 @@ export default function HomePage() {
               className="h-auto w-full"
               width={480}
               height={480}
+              sizes="(max-width: 640px) 256px, (max-width: 1024px) 384px, 480px"
               priority
+              quality={80}
             />
           </div>
         </div>
@@ -373,6 +375,9 @@ export default function HomePage() {
                 className="h-80 w-80 rounded-2xl object-cover shadow-lg"
                 width={320}
                 height={320}
+                sizes="(max-width: 640px) 280px, 320px"
+                loading="lazy"
+                quality={80}
               />
             </div>
             <div className="mt-8 space-y-4 text-muted-foreground">
