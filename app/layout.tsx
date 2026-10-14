@@ -45,6 +45,10 @@ export const metadata: Metadata = {
   authors: [{ name: "YourLearningMentor", url: "https://yourlearningmentor.com" }],
   creator: "YourLearningMentor",
   publisher: "YourLearningMentor",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/assets/logo.png",
+  },
   verification: {
     google: "4ItFjHNEQewLooFJfEkLAk7qUC6aoWALDwQRHAKek18",
   },
