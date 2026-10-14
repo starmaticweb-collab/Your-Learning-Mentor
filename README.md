@@ -192,4 +192,4 @@ my-app/
 
 ## 📄 License
 
-Copyright © 2026 **YourLearningMentor**. All rights reserved.
+Copyright © 2026 **YourLearningMentor**. All rights reserve
